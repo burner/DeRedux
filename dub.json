@@ -1,0 +1,9 @@
+{
+	"name": "deredux",
+	"authors": [
+		"burner"
+	],
+	"description": "Redux for DLang",
+	"copyright": "Copyright © 2016, burner",
+	"license": "LGPL3"
+}
