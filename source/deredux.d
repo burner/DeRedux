@@ -32,7 +32,7 @@ Foo bar(const(Foo) foo) {
 unittest {
 	import std.stdio;
 
-	State!(Foo) fooState;
+	auto fooState = State!(Foo)(Foo(1337));
 	fooState.exe(&bar);
 
 	FooRedux fr;
@@ -48,11 +48,11 @@ struct State(Type) {
 
 	shared(Mutex) mutex;
 
-	static State!Type opCall(Type)(Type initState) {
-		State!Type ret;
-		ret.mutex = new shared(Mutex)();
-		ret.state.insertBack(ImmuWrapper!Type(initState));
-		return ret;
+	this() @disable;
+
+	this(Type initState) {
+		this.mutex = cast(shared)(new Mutex());
+		this.state.insertBack(ImmuWrapper!Type(initState));
 	}
 
 	void exe(F,Args...)(F f, Args args) {
