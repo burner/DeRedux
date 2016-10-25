@@ -4,27 +4,14 @@ import std.array : appender;
 import std.format : formattedWrite;
 import std.traits;
 
-/*private string genReducerActionEnum(Type,Reducer)() pure @safe nothrow {
-	auto app = appender!string();
-	app.put("enum {\n");
-
-	foreach(memIt; __traits(allMembers, Reducer)) {
-		auto mem = __traits(getMember, Reducer, memIt);	
-		static if(isFunction!mem) {
-			auto params = Parameter!mem;
-			static if(params.length > 0 && is(params[0] == const(Type))) {
-				formattedWrite(app, "%s,", memIt);
-			}
-		}
-	}
-
-	return app.data;
-}*/
-
 struct ImmuWrapper(T) {
 	union {
 		immutable(T) immu;
 		T nImmu;
+	}
+
+	this(T v) {
+		this.nImmu = v;
 	}
 }
 
@@ -54,23 +41,24 @@ unittest {
 
 struct State(Type) {
 	import std.typecons : Rebindable;
-	import core.sync;
+	import core.sync.mutex;
+	import fixedsizearray;
 
-	shared(byte[(ImmuWrapper!Type).sizeof * 32]) stats;
-	shared(int) low;
-	shared(int) high;
-	shared(ImmuWrapper!Type) latest;
+	FixedSizeArray!(ImmuWrapper!Type,16) state;
+
 	shared(Mutex) mutex;
 
-	this() {
-		this.mutex = new shared(Mutex)();
-	}
-
-	this(Type initState) {
-		this();
+	static State!Type opCall(Type)(Type initState) {
+		State!Type ret;
+		ret.mutex = new shared(Mutex)();
+		ret.state.insertBack(ImmuWrapper!Type(initState));
+		return ret;
 	}
 
 	void exe(F,Args...)(F f, Args args) {
-		this.beginning.nImmu = f(this.beginning.immu, args);
+		if(this.state.length + 1 == this.state.capacity()) {
+			this.state.removeFront();
+		}
+		this.state.insertBack(ImmuWrapper!Type(f(this.state.back.immu, args)));
 	}
 }

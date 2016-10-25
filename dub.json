@@ -5,5 +5,7 @@
 	],
 	"description": "Redux for DLang",
 	"copyright": "Copyright © 2016, burner",
-	"license": "LGPL3"
+	"license": "LGPL3",
+	"sourcePaths" : ["source", "../fixedsizearray/source/", "../ExceptionHandling/source/"],
+	"importPaths" : ["source", "../fixedsizearray/source/", "../ExceptionHandling/source/"]
 }
