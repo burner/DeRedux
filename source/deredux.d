@@ -97,13 +97,18 @@ struct State(Type) {
 	Data!(Type) peek() {
 		return Data!(Type)(&this.state.back.immu);
 	}
+	string toString() const {
+		import std.array : appender;
+		auto app = appender!string();
 
-	string toString() {
+		this.toString(app);
+		return app.data;
+	}
+
+	void toString(D)(D app) const {
 		import std.stdio;
 		import std.format : formattedWrite;
-		import std.array : appender;
 
-		auto app = appender!string();
 		for(int i = 0; i < this.parameter.length; ++i) {
 			formattedWrite(app, "%2d %s line %d: %s(", this.parameter.length - i,
 					this.state[i].immu, this.parameter[i].line,
@@ -121,8 +126,6 @@ struct State(Type) {
 			formattedWrite(app, ")\n");
 		}
 		formattedWrite(app, "%2d %s", 0, this.state.back.immu);
-
-		return app.data;
 	}
 }
 

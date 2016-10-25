@@ -6,11 +6,13 @@
 	"description": "Redux for DLang",
 	"copyright": "Copyright © 2016, burner",
 	"license": "LGPL3",
-	"sourcePaths" : ["source", "../fixedsizearray/source/", 
+	"sourcePaths" : ["source", 
+		"../fixedsizearray/source/", 
 		"../ExceptionHandling/source/",
 		"../taggedalgebraic/source/"
 	],
-	"importPaths" : ["source", "../fixedsizearray/source/", 
+	"importPaths" : ["source", 
+		"../fixedsizearray/source/", 
 		"../ExceptionHandling/source/",
 		"../taggedalgebraic/source/"
 	]
