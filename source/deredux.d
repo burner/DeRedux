@@ -67,15 +67,20 @@ private struct StringParameter {
 	}
 }
 
-struct State(Type) {
+/** State can be your single source of truth if you let it.
+Call `exe` to run a function and use to `peek` to have a look at the last
+version of `immutable(Type)`. You should not hold a copy of the data returned
+by `peek`.
+*/
+struct State(Type,int Size = 16) {
 	import std.typecons : Rebindable;
 	import std.variant : Variant;
 	import core.sync.mutex;
 	import fixedsizearray;
 	import taggedalgebraic;
 
-	FixedSizeArray!(ImmuWrapper!Type,16) state;
-	FixedSizeArray!(StringParameter,15) parameter;
+	FixedSizeArray!(ImmuWrapper!Type,Size) state;
+	FixedSizeArray!(StringParameter,Size - 1) parameter;
 
 	this() @disable;
 
@@ -97,6 +102,10 @@ struct State(Type) {
 	Data!(Type) peek() {
 		return Data!(Type)(&this.state.back.immu);
 	}
+
+	/** Call this to get an output of the last few states and the passed
+	parameter.
+	*/
 	string toString() const {
 		import std.array : appender;
 		auto app = appender!string();
@@ -129,23 +138,21 @@ struct State(Type) {
 	}
 }
 
-version(unittest) {
-struct Foo {
-	int value;
-}
-
-struct FooRedux {
-	Foo fun(const(Foo) foo) {
-		return Foo(foo.value + 2);
-	}
-}
-
-Foo bar(const(Foo) foo, int i) {
-	return Foo(foo.value + i);
-}
-}
-
+/// Ditto
 unittest {
+	struct Foo {
+		int value;
+	}
+	
+	struct FooRedux {
+		Foo fun(const(Foo) foo) {
+			return Foo(foo.value + 2);
+		}
+	}
+	
+	Foo bar(const(Foo) foo, int i) {
+		return Foo(foo.value + i);
+	}
 	import std.stdio;
 	import exceptionhandling;
 
