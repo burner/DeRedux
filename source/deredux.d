@@ -15,26 +15,6 @@ private struct ImmuWrapper(T) {
 	}
 }
 
-private struct Data(T) {
-	import core.sync.mutex;
-	immutable(T)* data;
-
-	this(immutable(T)* data) {
-		this.data = data;
-	}
-
-	this() @disable;
-
-	this(this) @disable {}
-	void opAssign(T)(T other) @disable {}
-
-	alias get this;
-
-	ref immutable(T) get() {
-		return *this.data;
-	}
-}
-
 private union Parameters {
 	ubyte Ubyte;
 	ushort Ushort;
@@ -99,8 +79,8 @@ struct State(Type,int Size = 16) {
 		));
 	}
 
-	Data!(Type) peek() {
-		return Data!(Type)(&this.state.back.immu);
+	immutable(Type) peek() {
+		return this.state.back.immu;
 	}
 
 	/** Call this to get an output of the last few states and the passed
