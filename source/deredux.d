@@ -67,10 +67,15 @@ struct State(Type,int Size = 16) {
 
 	this() @disable;
 
+	/** Construct the State object with an `initState`.
+	*/
 	this(Type initState) {
 		this.state.insertBack(ImmuWrapper!Type(initState));
 	}
 
+	/** Execute the function `F`  on the current value with parameters
+	`Args...`.
+	*/
 	void exe(F,int line = __LINE__ ,Args...)(F f, Args args) {
 		if(this.state.length + 1 == this.state.capacity()) {
 			this.state.removeFront();
@@ -82,7 +87,9 @@ struct State(Type,int Size = 16) {
 		));
 	}
 
-	immutable(Type) peek() {
+	/** Peek at the current element.
+	*/
+	ref immutable(Type) peek() {
 		return this.state.back.immu;
 	}
 
@@ -97,6 +104,7 @@ struct State(Type,int Size = 16) {
 		return app.data;
 	}
 
+	/// Ditto
 	void toString(D)(D app) const {
 		import std.stdio;
 		import std.format : formattedWrite;
