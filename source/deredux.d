@@ -24,6 +24,9 @@ private union Parameters {
 	short Short;
 	int Int;
 	long Long;
+	float Float;
+	double Double;
+	real Real;
 	string String;
 	wstring Wstring;
 	dstring Dstring;
@@ -60,7 +63,7 @@ struct State(Type,int Size = 16) {
 	import taggedalgebraic;
 
 	FixedSizeArray!(ImmuWrapper!Type,Size) state;
-	FixedSizeArray!(StringParameter,Size - 1) parameter;
+	FixedSizeArray!(StringParameter,Size - 1) parameters;
 
 	this() @disable;
 
@@ -71,10 +74,10 @@ struct State(Type,int Size = 16) {
 	void exe(F,int line = __LINE__ ,Args...)(F f, Args args) {
 		if(this.state.length + 1 == this.state.capacity()) {
 			this.state.removeFront();
-			this.parameter.removeFront();
+			this.parameters.removeFront();
 		}
 		this.state.insertBack(ImmuWrapper!Type(f(this.state.back.immu, args)));
-		this.parameter.insertBack(StringParameter(
+		this.parameters.insertBack(StringParameter(
 				fullyQualifiedName!(F), line, args
 		));
 	}
@@ -98,13 +101,13 @@ struct State(Type,int Size = 16) {
 		import std.stdio;
 		import std.format : formattedWrite;
 
-		for(int i = 0; i < this.parameter.length; ++i) {
-			formattedWrite(app, "%2d %s line %d: %s(", this.parameter.length - i,
-					this.state[i].immu, this.parameter[i].line,
-					this.parameter[i].funcName
+		for(int i = 0; i < this.parameters.length; ++i) {
+			formattedWrite(app, "%2d %s line %d: %s(", this.parameters.length - i,
+					this.state[i].immu, this.parameters[i].line,
+					this.parameters[i].funcName
 			);
 			bool first = true;
-			foreach(it; this.parameter[i].parameters[]) {
+			foreach(it; this.parameters[i].parameters[]) {
 				if(first) {
 					formattedWrite(app, "%s", it);
 				} else {
